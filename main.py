@@ -74,7 +74,16 @@ def init_model_states():
         visited.append(new_0row)
 
 
-init_model_states()
+def update_knowledge(player_cur_loc):
+    x,y= player_cur_loc[0],player_cur_loc[1]
+    visited[x][y]=1
+    
+            
+    
+
+
+
+#init_model_states()
 
 print("wumpus_possible",wumpus_possible)
 print("pit_possible",pit_possible)
