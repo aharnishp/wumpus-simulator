@@ -143,6 +143,8 @@ def take_action(action_name):
         get_next_block_coor = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
         if(check_block_out_of_bounds(get_next_block_coor[0],get_next_block_coor[1])):
             print("Error: cannot move forward, out of bounds")
+        else:
+            player_cur_loc = get_next_block_coor
         
 
 
