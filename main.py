@@ -116,16 +116,14 @@ def take_action(action_name):
         player_cur_direction = legal_directions[(cur_direction_index-1)%4]
     elif(action_name == "right"):
         player_cur_direction = legal_directions[(cur_direction_index+1)%4]
-
     elif(action_name == "forward"):
         get_next_block_coor = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
-        if(check_block_out_of_bounds(get_next_block_coor[0],get_next_block_coor[1])):
+        if(check_out_of_bounds(get_next_block_coor[0],get_next_block_coor[1])):
             print("Error: cannot move forward, out of bounds")
         else:
-            player_cur_loc = get_next_block_coor
-        
+            player_cur_loc = get_next_block_coor  
     elif(action_name == "shoot"):
-        if(arrrows_left > 0):
+        if(arrows_left > 0):
             arrows_left -= 1
 
             adjacent_block = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
@@ -169,7 +167,7 @@ def update_knowledge(player_cur_loc):
                     wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=0
                 else:
                     continue
-        if get_current_block_info[i]!='breeze':
+        if get_current_block_info()[i]!='breeze':
             possible_pit = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
             for j in range(len(possible_pit)):
                 if (check_out_of_bounds(possible_pit[j][0],possible_pit[j][1])) and (visited[possible_pit[j][0]][possible_pit[j][1]]!=1):
