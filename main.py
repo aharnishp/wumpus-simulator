@@ -1,5 +1,5 @@
 # Global Settings
-    # create a map of the wumpus world
+# create a map of the wumpus world
 global_grid_xmin = 0    #inclusive
 global_grid_xmax = 3    #inclusive
 global_grid_ymin = 0    #inclusive
@@ -8,7 +8,10 @@ global_grid_ymax = 3    #inclusive
 global_grid_width = global_grid_xmax-global_grid_xmin
 global_grid_height = global_grid_ymax-global_grid_ymin
 
-    # declare locations
+# take unsafe steps
+take_unsafe_steps = True
+
+# declare locations
 pit_loc = [[1,3],[3,3],[3,1]]
 
 gold_loc = [2,2]
@@ -30,6 +33,10 @@ wumpus_alive = True
     # arrows left
 arrows_left = 1
 
+
+to_visit_stack = []     # stack of coordinates to visit
+visited = []            # list of coordinates visited
+dead_ends = []
 
 
 def check_out_of_bounds(x,y):
@@ -167,6 +174,7 @@ def update_knowledge(player_cur_loc):
                     wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=0
                 else:
                     continue
+
         if get_current_block_info()[i]!='breeze':
             possible_pit = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
             for j in range(len(possible_pit)):
@@ -176,12 +184,25 @@ def update_knowledge(player_cur_loc):
                     continue
 
 
+def planner(cur_x, cur_y):
+    # make a list of all nearby options with always safety first then not visited
+    choices = []
+    for direction in legal_directions:
+        # get next direction
+        next_visit_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
+        if (safe_loc(next_visit_block) and not(next_visit_block in visited) and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
+            choices.append(next_visit_block)
+
+        # if no valid safe option, then it can also visit the last visited node 
+            
+
+    # for  
 
 def safe_loc(x,y):
     if (wumpus_possible[x][y]!=1) and (pit_possible[x][y]!=1):
         return True
     else:
-        return False  
+        return False 
 
 
 init_model_states()
@@ -195,7 +216,6 @@ player_cur_loc = [2,1]
 print("current block info",get_current_block_info())
 
 
-
 # simulation loop
 while(1):
     if(check_game_over()):
@@ -204,4 +224,8 @@ while(1):
         break
 
     update_knowledge(player_cur_loc)
+
+    planner(player_cur_loc)
+
+
      
