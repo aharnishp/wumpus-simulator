@@ -128,12 +128,13 @@ def take_action(action_name):
         if(arrrows_left > 0):
             arrows_left -= 1
 
-            adjacent_block = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],pla/home/aharnish/Downloads/wumpus_colour_and_move.pyyer_cur_direction)
+            adjacent_block = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
             if(adjacent_block == wumpus_loc):
                 print("Wumpus killed!")
                 wumpus_alive = False
             else:
                 print("Missed Arrow!")
+
 
 
 # AI Model
