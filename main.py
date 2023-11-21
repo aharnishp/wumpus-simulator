@@ -25,6 +25,11 @@ player_cur_direction = "west"
     # Wumpus alive
 wumpus_alive = True
 
+def check_out_of_bounds(x,y):
+    if x<global_grid_xmin or x>global_grid_xmax or y<global_grid_ymin or y>global_grid_ymax:
+            return True
+    return False
+
 def get_current_block_info():
     """
     returns if current block has stench or breeze or gold
@@ -97,10 +102,35 @@ def init_model_states():
         pit_possible.append(new_1row)
         visited.append(new_0row)
 
-def update_knowledge():
-    pass
 
-init_model_states()
+def update_knowledge(player_cur_loc):
+    x,y= player_cur_loc[0],player_cur_loc[1]
+    visited[x][y]=1
+    for i in range(len(get_current_block_info)):
+        if get_current_block_info[i]=='stench':
+            possible_wumpus = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
+            for j in range(len(possible_wumpus)):
+                if (check_out_of_bounds(possible_wumpus[j][0],possible_wumpus[j][1])) and (visited[possible_wumpus[j][0]][possible_wumpus[j][1]]!=1):
+                    wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=1
+                else:
+                    continue
+        if get_current_block_info[i]=='breeze':
+            possible_pit = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
+            for j in range(len(possible_pit)):
+                if (check_out_of_bounds(possible_pit[j][0],possible_pit[j][1])) and (visited[possible_pit[j][0]][possible_pit[j][1]]!=1):
+                    pit_possible[possible_pit[j][0]][possible_pit[j][1]]=1
+                else:
+                    continue
+
+
+
+    
+            
+    
+
+
+
+#init_model_states()
 
 print("wumpus_possible",wumpus_possible)
 print("pit_possible",pit_possible)
@@ -120,3 +150,4 @@ while(1):
         break
 
     update_knowledge()
+     
