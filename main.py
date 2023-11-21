@@ -127,21 +127,29 @@ def init_model_states():
 def update_knowledge(player_cur_loc):
     x,y= player_cur_loc[0],player_cur_loc[1]
     visited[x][y]=1
-    for i in range(len(get_current_block_info)):
-        if get_current_block_info[i]=='stench':
+    for i in range(len(get_current_block_info())):
+        if get_current_block_info()[i]!='stench':
             possible_wumpus = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
             for j in range(len(possible_wumpus)):
                 if (check_out_of_bounds(possible_wumpus[j][0],possible_wumpus[j][1])) and (visited[possible_wumpus[j][0]][possible_wumpus[j][1]]!=1):
-                    wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=1
+                    wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=0
                 else:
                     continue
-        if get_current_block_info[i]=='breeze':
+        if get_current_block_info()[i]!='breeze':
             possible_pit = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
             for j in range(len(possible_pit)):
                 if (check_out_of_bounds(possible_pit[j][0],possible_pit[j][1])) and (visited[possible_pit[j][0]][possible_pit[j][1]]!=1):
-                    pit_possible[possible_pit[j][0]][possible_pit[j][1]]=1
+                    pit_possible[possible_pit[j][0]][possible_pit[j][1]]=0
                 else:
                     continue
+
+
+
+def safe_loc(x,y):
+    if (wumpus_possible[x][y]!=1) and (pit_possible[x][y]!=1):
+        return True
+    else:
+        return False  
 
 
 init_model_states()
@@ -163,5 +171,5 @@ while(1):
         print("player_cur_loc",player_cur_loc)
         break
 
-    update_knowledge()
+    update_knowledge(player_cur_loc)
      
