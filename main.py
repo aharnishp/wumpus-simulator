@@ -210,7 +210,7 @@ def direction_num(direction):
         dir_num=3
     return dir_num
 
-def num_to_direction(dir_num):
+"""def num_to_direction(dir_num):
     # return the direction based on the numerical input
     if dir_num == 0:
         return "north"
@@ -222,7 +222,7 @@ def num_to_direction(dir_num):
         return "west"
     else:
         print("Error: invalid direction number")
-        return None
+        return None"""
     
 def get_direction_between_blocks(cur_x, cur_y, new_x, new_y):
     # return the direction from the current block to the new block
@@ -239,32 +239,27 @@ def get_direction_between_blocks(cur_x, cur_y, new_x, new_y):
         return None
     
 def action_implementation(new_loc):
-    "checks if there is stench and kills the wumpus or else performs action to go to the new location"
+    "performs action to go to the new location"
     x,y= player_cur_loc()[0],player_cur_loc()[1]
     x1,y1=new_loc[0],new_loc[1]
-    if "stench" in get_current_block_info(): #checks if the current location has stench and kills the wumpus in adjacent blocks
-        while wumpus_alive:
-           take_action("shoot")
-           player_cur_direction=num_to_direction((direction_num(player_cur_direction)+1)%4)
-    else:
-        if check_out_of_bounds(new_loc):
-            print("Error, out of bounds")
-        cur_dir= direction_num(player_cur_direction)
-        new_dir = direction_num(get_direction_between_blocks(x,y,x1,y1))
-        diff=new_dir-cur_dir
-        if diff ==0 or diff==3:
-            take_action("forward")
-        if diff ==1:
-            take_action("right")
-            take_action("forward")
-        if diff ==2 or diff==-2:
-            take_action("right")
-            take_action("right")
-            take_action("forward")
-        if diff ==-1:
-            take_action("left")
-            take_action("forward")
-        print("the player is at the new location",player_cur_loc) #prints the new location    
+    if check_out_of_bounds(new_loc):
+        print("Error, out of bounds")
+    cur_dir= direction_num(player_cur_direction)
+    new_dir = direction_num(get_direction_between_blocks(x,y,x1,y1))
+    diff=new_dir-cur_dir
+    if diff ==0 or diff==3:
+        take_action("forward")
+    if diff ==1:
+        take_action("right")
+        take_action("forward")
+    if diff ==2 or diff==-2:
+        take_action("right")
+        take_action("right")
+        take_action("forward")
+    if diff ==-1:
+        take_action("left")
+        take_action("forward")
+    print("the player is at the new location",player_cur_loc) #prints the new location    
 
 def safe_loc(x,y):
     if (wumpus_possible[x][y]!=1) and (pit_possible[x][y]!=1):
