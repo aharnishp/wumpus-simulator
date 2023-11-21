@@ -35,7 +35,6 @@ arrows_left = 1
 
 
 to_visit_stack = []     # stack of coordinates to visit
-visited = []            # list of coordinates visited
 dead_ends = []
 
 
@@ -45,6 +44,8 @@ def check_out_of_bounds(x,y):
     return False
 
 
+def mark_visited(x,y):
+    visited[x][y] = 1
 
 
 def get_current_block_info():
@@ -183,6 +184,11 @@ def update_knowledge(player_cur_loc):
                 else:
                     continue
 
+def safe_loc(x,y):
+    if (wumpus_possible[x][y]!=1) and (pit_possible[x][y]!=1):
+        return True
+    else:
+        return False
 
 def planner(cur_x, cur_y):
     # make a list of all nearby options with always safety first then not visited
@@ -190,19 +196,24 @@ def planner(cur_x, cur_y):
     for direction in legal_directions:
         # get next direction
         next_visit_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
-        if (safe_loc(next_visit_block) and not(next_visit_block in visited) and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
+        if (safe_loc(next_visit_block) and not(next_visit_block in visited) and not(next_visit_block in dead_ends) and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
             choices.append(next_visit_block)
 
-        # if no valid safe option, then it can also visit the last visited node 
-            
+    # if no valid safe option is found in first local search, then it can also visit the last visited node and marks current node as dead_end
+    dead_ends.append(next_visit_block)
+    for direction in legal_directions:
+        if (safe_loc(next_visit_block) and not(next_visit_block in dead_ends) and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
+            choices.append(next_visit_block)    ## adding last visited node as next to visit node
 
-    # for  
 
-def safe_loc(x,y):
-    if (wumpus_possible[x][y]!=1) and (pit_possible[x][y]!=1):
-        return True
-    else:
-        return False 
+
+    # if more than one choices, add other choices to_visit_stack
+    if(len(choices) > 1):
+        for i in range(1,len(choices)):
+            to_visit_stack.append(next_visit_block[i])
+    mark_visited(choices[0][0],choices[0][1])
+
+    # for 
 
 
 init_model_states()
