@@ -37,6 +37,9 @@ def check_out_of_bounds(x,y):
             return True
     return False
 
+
+
+
 def get_current_block_info():
     """
     returns if current block has stench or breeze or gold
@@ -102,6 +105,36 @@ def check_game_over():
     return True
 
 
+def take_action(action_name):
+    """
+    Possible actions: forward, left, right, shoot, grab
+    """
+
+    # read legal directions index
+    cur_direction_index = legal_directions.index(player_cur_direction)
+    if(action_name == "left"):
+        player_cur_direction = legal_directions[(cur_direction_index-1)%4]
+    elif(action_name == "right"):
+        player_cur_direction = legal_directions[(cur_direction_index+1)%4]
+
+    elif(action_name == "forward"):
+        get_next_block_coor = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
+        if(check_block_out_of_bounds(get_next_block_coor[0],get_next_block_coor[1])):
+            print("Error: cannot move forward, out of bounds")
+        else:
+            player_cur_loc = get_next_block_coor
+        
+    elif(action_name == "shoot"):
+        if(arrrows_left > 0):
+            arrows_left -= 1
+
+            adjacent_block = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],pla/home/aharnish/Downloads/wumpus_colour_and_move.pyyer_cur_direction)
+            if(adjacent_block == wumpus_loc):
+                print("Wumpus killed!")
+                wumpus_alive = False
+            else:
+                print("Missed Arrow!")
+
 
 # AI Model
 # grid that stores information about where wumpus could be
@@ -127,15 +160,16 @@ def init_model_states():
 def update_knowledge(player_cur_loc):
     x,y= player_cur_loc[0],player_cur_loc[1]
     visited[x][y]=1
-    for i in range(len(get_current_block_info)):
-        if get_current_block_info[i]=='stench':
+
+    for i in range(len(get_current_block_info())):
+        if get_current_block_info()[i]=='stench':
             possible_wumpus = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
             for j in range(len(possible_wumpus)):
                 if (check_out_of_bounds(possible_wumpus[j][0],possible_wumpus[j][1])) and (visited[possible_wumpus[j][0]][possible_wumpus[j][1]]!=1):
                     wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=1
                 else:
                     continue
-        if get_current_block_info[i]=='breeze':
+        if get_current_block_info()[i]=='breeze':
             possible_pit = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
             for j in range(len(possible_pit)):
                 if (check_out_of_bounds(possible_pit[j][0],possible_pit[j][1])) and (visited[possible_pit[j][0]][possible_pit[j][1]]!=1):
@@ -163,5 +197,5 @@ while(1):
         print("player_cur_loc",player_cur_loc)
         break
 
-    update_knowledge()
+    update_knowledge(player_cur_loc)
      
