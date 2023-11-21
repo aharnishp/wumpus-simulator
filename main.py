@@ -1,9 +1,9 @@
 # Global Settings
     # create a map of the wumpus world
-global_grid_xmin = 0
-global_grid_xmax = 3
-global_grid_ymin = 0
-global_grid_ymax = 3
+global_grid_xmin = 0    #inclusive
+global_grid_xmax = 3    #inclusive
+global_grid_ymin = 0    #inclusive
+global_grid_ymax = 3    #inclusive
 
 global_grid_width = global_grid_xmax-global_grid_xmin
 global_grid_height = global_grid_ymax-global_grid_ymin
@@ -22,8 +22,15 @@ player_cur_loc = [1,1] # [x,y]
     # direction facing
 player_cur_direction = "west"
 
+legal_directions = ["north","east","south","west"]  # is ordered list, do not change
+
     # Wumpus alive
 wumpus_alive = True
+
+    # arrows left
+arrows_left = 1
+
+
 
 def get_current_block_info():
     """
@@ -51,6 +58,19 @@ def get_current_block_info():
 
     return current_block_info
 
+def get_adjacent_blocks_coor(cur_x, cur_y, direction):
+    # return the coordinates of the block adjacent to the current block in that direction
+    if(direction == "north"):
+        return [cur_x,cur_y+1]
+    elif(direction == "east"):
+        return [cur_x+1,cur_y]
+    elif(direction == "south"):
+        return [cur_x,cur_y-1]
+    elif(direction == "west"):
+        return [cur_x-1,cur_y]
+    else:
+        print("Error: invalid direction")
+        return None
 
 
 def check_game_over():
@@ -79,7 +99,7 @@ def check_game_over():
 
 
 # AI Model
-    # grid that stores information about where wumpus could be
+# grid that stores information about where wumpus could be
 wumpus_possible = []    # init with 1 everywhere
 
 pit_possible = []       # init with 1 everywhere
@@ -99,6 +119,46 @@ def init_model_states():
 
 def update_knowledge():
     pass
+
+def check_block_out_of_bounds(x,y):
+    if(x < global_grid_xmin or x > global_grid_xmax or
+        y < global_grid_ymin or y > global_grid_ymax):
+        return True
+    return False
+
+
+def take_action(action_name):
+    """
+    Possible actions: forward, left, right, shoot, grab
+    """
+
+    # read legal directions index
+    cur_direction_index = legal_directions.index(player_cur_direction)
+    if(action_name == "left"):
+        player_cur_direction = legal_directions[(cur_direction_index-1)%4]
+    elif(action_name == "right"):
+        player_cur_direction = legal_directions[(cur_direction_index+1)%4]
+
+    elif(action_name == "forward"):
+        get_next_block_coor = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
+        if(check_block_out_of_bounds(get_next_block_coor[0],get_next_block_coor[1])):
+            print("Error: cannot move forward, out of bounds")
+        
+
+
+    elif(action_name == "shoot"):
+        if(arrrows_left > 0):
+            arrows_left -= 1
+
+            adjacent_block = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
+            if(adjacent_block == wumpus_loc):
+                print("Wumpus killed!")
+                wumpus_alive = False
+            else:
+                print("Missed Arrow!")
+
+
+
 
 init_model_states()
 
