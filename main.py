@@ -32,6 +32,11 @@ arrows_left = 1
 
 
 
+def check_out_of_bounds(x,y):
+    if x<global_grid_xmin or x>global_grid_xmax or y<global_grid_ymin or y>global_grid_ymax:
+            return True
+    return False
+
 def get_current_block_info():
     """
     returns if current block has stench or breeze or gold
@@ -117,49 +122,26 @@ def init_model_states():
         pit_possible.append(new_1row)
         visited.append(new_0row)
 
-def update_knowledge():
-    pass
-
-def check_block_out_of_bounds(x,y):
-    if(x < global_grid_xmin or x > global_grid_xmax or
-        y < global_grid_ymin or y > global_grid_ymax):
-        return True
-    return False
-
-
-def take_action(action_name):
-    """
-    Possible actions: forward, left, right, shoot, grab
-    """
-
-    # read legal directions index
-    cur_direction_index = legal_directions.index(player_cur_direction)
-    if(action_name == "left"):
-        player_cur_direction = legal_directions[(cur_direction_index-1)%4]
-    elif(action_name == "right"):
-        player_cur_direction = legal_directions[(cur_direction_index+1)%4]
-
-    elif(action_name == "forward"):
-        get_next_block_coor = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
-        if(check_block_out_of_bounds(get_next_block_coor[0],get_next_block_coor[1])):
-            print("Error: cannot move forward, out of bounds")
-        else:
-            player_cur_loc = get_next_block_coor
         
 
-
-    elif(action_name == "shoot"):
-        if(arrrows_left > 0):
-            arrows_left -= 1
-
-            adjacent_block = get_adjacent_blocks_coor(player_cur_loc[0],player_cur_loc[1],player_cur_direction)
-            if(adjacent_block == wumpus_loc):
-                print("Wumpus killed!")
-                wumpus_alive = False
-            else:
-                print("Missed Arrow!")
-
-
+def update_knowledge(player_cur_loc):
+    x,y= player_cur_loc[0],player_cur_loc[1]
+    visited[x][y]=1
+    for i in range(len(get_current_block_info)):
+        if get_current_block_info[i]=='stench':
+            possible_wumpus = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
+            for j in range(len(possible_wumpus)):
+                if (check_out_of_bounds(possible_wumpus[j][0],possible_wumpus[j][1])) and (visited[possible_wumpus[j][0]][possible_wumpus[j][1]]!=1):
+                    wumpus_possible[possible_wumpus[j][0]][possible_wumpus[j][1]]=1
+                else:
+                    continue
+        if get_current_block_info[i]=='breeze':
+            possible_pit = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
+            for j in range(len(possible_pit)):
+                if (check_out_of_bounds(possible_pit[j][0],possible_pit[j][1])) and (visited[possible_pit[j][0]][possible_pit[j][1]]!=1):
+                    pit_possible[possible_pit[j][0]][possible_pit[j][1]]=1
+                else:
+                    continue
 
 
 init_model_states()
@@ -182,3 +164,4 @@ while(1):
         break
 
     update_knowledge()
+     
