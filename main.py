@@ -25,6 +25,34 @@ player_cur_direction = "west"
     # Wumpus alive
 wumpus_alive = True
 
+def get_current_block_info():
+    """
+    returns if current block has stench or breeze or gold
+    """
+    current_block_info = []
+
+    if(player_cur_loc == gold_loc):
+        current_block_info.append("gold")
+    # if wumpus is near wumpus location
+    if((player_cur_loc[0] == wumpus_loc[0] and player_cur_loc[1] == wumpus_loc[1]+1) or
+        (player_cur_loc[0] == wumpus_loc[0]+1 and player_cur_loc[1] == wumpus_loc[1]) or
+        (player_cur_loc[0] == wumpus_loc[0] and player_cur_loc[1] == wumpus_loc[1]-1) or
+        (player_cur_loc[0] == wumpus_loc[0]-1 and player_cur_loc[1] == wumpus_loc[1])):
+        current_block_info.append("stench")
+
+    # if pit is near pit location
+    for this_pit in pit_loc:
+        if((player_cur_loc[0] == this_pit[0] and player_cur_loc[1] == this_pit[1]+1) or
+            (player_cur_loc[0] == this_pit[0]+1 and player_cur_loc[1] == this_pit[1]) or
+            (player_cur_loc[0] == this_pit[0] and player_cur_loc[1] == this_pit[1]-1) or
+            (player_cur_loc[0] == this_pit[0]-1 and player_cur_loc[1] == this_pit[1])):
+            current_block_info.append("breeze")
+            break   # to prevent more than one breeze
+
+    return current_block_info
+
+
+
 def check_game_over():
     
     for pit in pit_loc:             # check if player is present inside any pit?
@@ -48,10 +76,6 @@ def check_game_over():
     print("Game Over: visited all locations")
     return True
 
-        
-        
-
-
 
 
 # AI Model
@@ -73,6 +97,8 @@ def init_model_states():
         pit_possible.append(new_1row)
         visited.append(new_0row)
 
+def update_knowledge():
+    pass
 
 init_model_states()
 
@@ -80,6 +106,17 @@ print("wumpus_possible",wumpus_possible)
 print("pit_possible",pit_possible)
 print("visited",visited)
 
+############### Playground Testing ###############
+player_cur_loc = [2,1]
+print("current block info",get_current_block_info())
+
+
+
 # simulation loop
 while(1):
-    pass
+    if(check_game_over()):
+        print("Game Over!")
+        print("player_cur_loc",player_cur_loc)
+        break
+
+    update_knowledge()
