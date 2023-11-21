@@ -47,6 +47,10 @@ def check_out_of_bounds(x,y):
 def mark_visited(x,y):
     visited[x][y] = 1
 
+def check_visited(x,y):
+    return(visited[x][y])
+        
+
 
 def get_current_block_info():
     """
@@ -107,7 +111,7 @@ def check_game_over():
     # check if player has visited all locations
     for y in range(global_grid_ymin,global_grid_ymax+1):
         for x in range(global_grid_xmin,global_grid_xmax+1):
-            if visited[y][x] == 0:
+            if visited[x][y] == 0:
                 return False
     print("Game Over: visited all locations")
     return True
@@ -145,6 +149,7 @@ def take_action(action_name):
 
 # AI Model
 # grid that stores information about where wumpus could be
+## All the 2D grids can be accessed as [x][y]
 wumpus_possible = []    # init with 1 everywhere
 
 pit_possible = []       # init with 1 everywhere
@@ -196,7 +201,11 @@ def planner(cur_x, cur_y):
     for direction in legal_directions:
         # get next direction
         next_visit_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
-        if (safe_loc(next_visit_block) and not(next_visit_block in visited) and not(next_visit_block in dead_ends) and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
+        if (safe_loc(next_visit_block) 
+            and not(visited[next_visit_block[0]][next_visit_block[1]]) 
+            and not(next_visit_block in dead_ends) 
+            and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
+
             choices.append(next_visit_block)
 
     # if no valid safe option is found in first local search, then it can also visit the last visited node and marks current node as dead_end
@@ -204,6 +213,8 @@ def planner(cur_x, cur_y):
     for direction in legal_directions:
         if (safe_loc(next_visit_block) and not(next_visit_block in dead_ends) and check_out_of_bounds(next_visit_block[0],next_visit_block[1])):
             choices.append(next_visit_block)    ## adding last visited node as next to visit node
+
+    
 
 
 
