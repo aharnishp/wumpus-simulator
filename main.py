@@ -215,9 +215,6 @@ def planner(cur_x, cur_y):
             choices.append(next_visit_block)    ## adding last visited node as next to visit node
 
     
-
-
-
     # if more than one choices, add other choices to_visit_stack
     if(len(choices) > 1):
         for i in range(1,len(choices)):
@@ -225,6 +222,76 @@ def planner(cur_x, cur_y):
     mark_visited(choices[0][0],choices[0][1])
 
     # for 
+
+
+
+def direction_num(direction):
+    if direction=="north":
+        dir_num=0
+    elif direction=="east":
+        dir_num=1
+    elif direction =="south":
+        dir_num=2
+    elif direction =="west":
+        dir_num=3
+    return dir_num
+
+"""def num_to_direction(dir_num):
+    # return the direction based on the numerical input
+    if dir_num == 0:
+        return "north"
+    elif dir_num == 1:
+        return "east"
+    elif dir_num == 2:
+        return "south"
+    elif dir_num == 3:
+        return "west"
+    else:
+        print("Error: invalid direction number")
+        return None"""
+    
+def get_direction_between_blocks(cur_x, cur_y, new_x, new_y):
+    # return the direction from the current block to the new block
+    if new_x == cur_x and new_y == cur_y + 1:
+        return "north"
+    elif new_x == cur_x + 1 and new_y == cur_y:
+        return "east"
+    elif new_x == cur_x and new_y == cur_y - 1:
+        return "south"
+    elif new_x == cur_x - 1 and new_y == cur_y:
+        return "west"
+    else:
+        print("Error: invalid coordinates")
+        return None
+    
+def action_implementation(new_loc):
+    "performs action to go to the new location"
+    x,y= player_cur_loc()[0],player_cur_loc()[1]
+    x1,y1=new_loc[0],new_loc[1]
+    if check_out_of_bounds(new_loc):
+        print("Error, out of bounds")
+    cur_dir= direction_num(player_cur_direction)
+    new_dir = direction_num(get_direction_between_blocks(x,y,x1,y1))
+    diff=new_dir-cur_dir
+    if diff ==0 or diff==3:
+        take_action("forward")
+    if diff ==1:
+        take_action("right")
+        take_action("forward")
+    if diff ==2 or diff==-2:
+        take_action("right")
+        take_action("right")
+        take_action("forward")
+    if diff ==-1:
+        take_action("left")
+        take_action("forward")
+    print("the player is at the new location",player_cur_loc) #prints the new location    
+
+def safe_loc(x,y):
+    if (wumpus_possible[x][y]!=1) and (pit_possible[x][y]!=1):
+        return True
+    else:
+        return False 
 
 
 init_model_states()
