@@ -21,7 +21,8 @@ wumpus_loc = [3,1]
 
 # State Variables
     # and the agent starts at the given coordinate
-player_cur_loc = [1,1] # [x,y]
+initial_location = [0,0]
+player_cur_loc = [0,0] # [x,y]
     # direction facing
 player_cur_direction = "west"
 
@@ -111,8 +112,12 @@ def check_game_over():
             return True
     
     if gold_loc == player_cur_loc:  # check if player is present at gold location?
-        print("Game Over: gold")
+        print("Gold found, yay!")
+        while player_cur_loc!= initial_location:
+            return_back(player_cur_loc[0],player_cur_loc[1])
+        print("the player is back and the gold is found!")
         return True
+    
     # check if player has visited all locations
     for y in range(global_grid_ymin,global_grid_ymax+1):
         for x in range(global_grid_xmin,global_grid_xmax+1):
@@ -183,9 +188,6 @@ def init_model_states():
 def update_knowledge(player_cur_loc):
     x,y= player_cur_loc[0],player_cur_loc[1]
     visited[x][y]=1
-
-    
-
     current_block_info = get_current_block_info()
     if not("stench" in current_block_info):
         possible_wumpus = [[x+1,y],[x-1,y],[x,y+1],[x,y-1]]
@@ -231,13 +233,36 @@ def safe_loc(x,y):
     else:
         return False
 
+
+back_home_visited=[] #tracks visited blocks while going home
+back_home_deadend=[] #tracks blocks which are dead end while going home
+
+def return_back(cur_x,cur_y):
+    choices=[]
+    for direction in legal_directions:
+        next_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
+        if visited[next_block[0]][next_block[1]] and not(check_out_of_bounds(next_block[0],next_block[1])) and safe_loc(next_block[0],next_block[1]) and not (next_block in dead_ends)and not (next_block in back_home_visited)and not (next_block in back_home_deadend):
+            choices.append(next_block)
+    if(len(choices) == 0):
+        back_home_deadend.append([cur_x,cur_y])
+        for direction in legal_directions:
+            next_visit_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
+            if (safe_loc(next_visit_block[0],next_visit_block[1]) and not(next_visit_block in dead_ends)and not(next_visit_block in back_home_deadend) and not(check_out_of_bounds(next_visit_block[0],next_visit_block[1]))):
+                choices.append(next_visit_block)
+    print("choices:",choices)
+    next_block_final = choices[0]
+    back_home_visited.append(next_block_final)
+    action_implementation(next_block_final)
+    return(player_cur_loc[0],player_cur_loc[1])
+        
+
 def planner(cur_x, cur_y):
     # make a list of all nearby options with always safety first then not visited
     choices = []
     for direction in legal_directions:
         # get next direction
         next_visit_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
-        if (safe_loc(next_visit_block[0],next_visit_block[1])                                          # the location is safe (no pit, no wumpus)
+        if (safe_loc(next_visit_block[0],next_visit_block[1])                   # the location is safe (no pit, no wumpus)
             and not(visited[next_visit_block[0]][next_visit_block[1]])          # the location is not visited
             and not(next_visit_block in dead_ends)                              # the location is not a dead end
             and not(check_out_of_bounds(next_visit_block[0],next_visit_block[1]))):  # the location is inside the grid
@@ -265,7 +290,6 @@ def planner(cur_x, cur_y):
     # mark_visited(next_block_final[0],next_block_final[1])
     action_implementation(next_block_final)
 
-    # for 
 
 def print_grid():
     # print grid with w for wumpus, p for pit, g for gold, ^v>< for agent with direction
