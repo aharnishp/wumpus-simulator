@@ -234,8 +234,15 @@ def safe_loc(x,y):
         return False
 
 
+
 back_home_visited=[] #tracks visited blocks while going home
 back_home_deadend=[] #tracks blocks which are dead end while going home
+
+
+reach_dead_ends = []    # tracks dead ends while reaching destination
+reach_visited = []
+reach_cached_target_location = [-1,-1]   # stores location for which the above arrays are relevant
+
 
 def return_back(cur_x,cur_y):
     choices=[]
@@ -254,6 +261,50 @@ def return_back(cur_x,cur_y):
     back_home_visited.append(next_block_final)
     action_implementation(next_block_final)
     return(player_cur_loc[0],player_cur_loc[1])
+
+def manhatten_distance(cur_x,cur_y,new_x,new_y):
+    return(abs(cur_x-new_x)+abs(cur_y-new_y))
+
+def reach_position(new_x,new_y):
+
+    # clear dead_ends if target location is changed
+    if(reach_cached_target_location[0] != new_x or reach_cached_target_location[1] != new_y):
+        reach_dead_ends.clear()
+        reach_visited.clear()
+        reach_cached_target_location[0] = new_x
+        reach_cached_target_location[1] = new_y
+
+    cur_x,cur_y = player_cur_loc[0],player_cur_loc[1]
+    choices=[]
+    for direction in legal_directions:
+        next_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
+        if visited[next_block[0]][next_block[1]] and not(check_out_of_bounds(next_block[0],next_block[1])) and safe_loc(next_block[0],next_block[1]) and not (next_block in dead_ends)and not (next_block in reach_visited)and not (next_block in reach_dead_ends):
+            choices.append(next_block)
+    if(len(choices) == 0):
+        reach_dead_ends.append([cur_x,cur_y])
+        for direction in legal_directions:
+            next_visit_block = get_adjacent_blocks_coor(cur_x,cur_y,direction)
+            if (safe_loc(next_visit_block[0],next_visit_block[1]) and not(next_visit_block in dead_ends)and not(next_visit_block in reach_dead_ends) and not(check_out_of_bounds(next_visit_block[0],next_visit_block[1]))):
+                choices.append(next_visit_block)
+    print("choices:",choices)
+
+    # chooses the next block according to manhatten distance as heuristic
+    min_manh_indx = 0
+    min_manh_dist = manhatten_distance(choices[0][0],choices[0][1],new_x,new_y)
+    if(len(choices) > 1):
+        for indx,choice in iter(choices):
+            if(indx == 0):
+                continue
+            if(manhatten_distance(cur_x,cur_y,choice[0],choice[1]) < min_manh_dist):
+                min_manh_indx = indx
+                min_manh_dist = manhatten_distance(cur_x,cur_y,choice[0],choice[1])
+
+    next_block_final = choices[min_manh_indx]
+
+    reach_visited.append(next_block_final)
+    action_implementation(next_block_final)
+    return(player_cur_loc[0],player_cur_loc[1])
+
         
 
 def planner(cur_x, cur_y):
